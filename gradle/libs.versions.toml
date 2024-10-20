@@ -7,6 +7,12 @@ appcompat = "1.6.1"
 material = "1.10.0"
 activity = "1.8.0"
 constraintlayout = "2.1.4"
+naviXdmap = "10.0.800_3dmap10.0.800"
+search = "9.7.1"
+xdmapLocationSearch = "10.0.900_loc6.4.7_sea9.7.3"
+location = "6.4.7"
+core = "4.3.13"
+searchVersion = "9.4.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -16,6 +22,12 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+navi-xdmap = { group = "com.amap.api", name = "navi-3dmap", version.ref = "naviXdmap" }
+search = { group = "com.amap.api", name = "search", version.ref = "search" }
+xdmap-location-search = { group = "com.amap.api", name = "3dmap-location-search", version.ref = "xdmapLocationSearch" }
+location = { group = "com.amap.api", name = "location", version.ref = "location" }
+core = { group = "com.amap.api", name = "core", version.ref = "core" }
+api-search = { group = "com.amap.api", name = "search", version.ref = "searchVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

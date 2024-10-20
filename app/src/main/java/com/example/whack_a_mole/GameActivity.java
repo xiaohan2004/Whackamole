@@ -1,10 +1,13 @@
 package com.example.whack_a_mole;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -12,6 +15,10 @@ import android.widget.TextView;
 import android.media.SoundPool;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
+import com.amap.api.location.AMapLocationClient;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -19,6 +26,8 @@ import java.util.Set;
 
 
 public class GameActivity extends AppCompatActivity {
+    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private static final int REQUEST_CODE = 1;
     private TextView scoreText;
     private TextView timerText;
     private Button startButton; // 开始按钮
@@ -30,10 +39,12 @@ public class GameActivity extends AppCompatActivity {
     private ImageView[] moles;
     private Random random = new Random();
     private Handler handler = new Handler();
-    private String selectedDifficulty;
+    private String selectedDifficulty="medium";
     private SoundPool soundPool;
     private int hitSoundId;
     private int missSoundId;
+    private DBHelper dbHelper;
+    private LocationHelper locationHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +81,22 @@ public class GameActivity extends AppCompatActivity {
         hitSoundId = soundPool.load(this, R.raw.hit_sound, 1);
         missSoundId = soundPool.load(this, R.raw.miss_sound, 1);
 
+        dbHelper = new DBHelper(this);
+
+//        // 检查并请求定位权限
+//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+//                    REQUEST_LOCATION_PERMISSION);
+//        }
+//
+//        // 更新隐私协议
+//        AMapLocationClient.updatePrivacyShow(this, true, true);
+//        AMapLocationClient.updatePrivacyAgree(this, true);
+
+//        locationHelper = new LocationHelper(this);
+
         showDifficultyDialog();
 
 //        setDifficulty("medium");
@@ -77,6 +104,11 @@ public class GameActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        recordGameState("中途退出","游戏难度："+selectedDifficulty+";游戏分数：" + score);
+        dbHelper.close();
+        if (locationHelper != null) {
+            locationHelper.stopLocation();
+        }
         super.onDestroy();
         if (soundPool != null) {
             soundPool.release();
@@ -102,6 +134,7 @@ public class GameActivity extends AppCompatActivity {
         setDifficulty(selectedDifficulty);
         // 禁用开始按钮，防止多次点击
         startButton.setEnabled(false);
+        recordGameState("游戏开始","游戏难度："+selectedDifficulty);
 
         score = 0;
         timeRemaining = 30;
@@ -244,6 +277,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void showGameOverDialog() {
+        recordGameState("游戏结束","游戏难度："+selectedDifficulty+";游戏分数：" + score);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("游戏结束")
                 .setMessage("你的最终分数是: " + score)
@@ -279,4 +313,13 @@ public class GameActivity extends AppCompatActivity {
             view.setVisibility(View.INVISIBLE); // 点击后隐藏地鼠
         }
     }
+
+    private void recordGameState(String status,String gameInfo) {
+        double latitude=0;// todo
+        double longitude=0;// todo
+        String address = "获取到的地址";//todo
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        dbHelper.saveLocationToDatabase(latitude, longitude, timestamp, address, status, gameInfo);
+    }
+
 }
