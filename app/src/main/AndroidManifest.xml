@@ -21,7 +21,7 @@
         tools:targetApi="31">
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="386b8cac45e2f79cf83990ad6da9eed4"/>
+            android:value="0855dd4dbeeebc4def5e0a4482df49a5"/>
         <activity
             android:name=".SettingsActivity"
             android:exported="false" />

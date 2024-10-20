@@ -97,10 +97,20 @@ public class GameActivity extends AppCompatActivity {
 
 //        locationHelper = new LocationHelper(this);
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+
         showDifficultyDialog();
+
+        // 创建 LocationHelper 实例
+        locationHelper = new LocationHelper(this);
 
 //        setDifficulty("medium");
     }
+
+
+
 
     @Override
     protected void onDestroy() {
@@ -314,12 +324,16 @@ public class GameActivity extends AppCompatActivity {
         }
     }
 
-    private void recordGameState(String status,String gameInfo) {
-        double latitude=0;// todo
-        double longitude=0;// todo
-        String address = "获取到的地址";//todo
-        String timestamp = String.valueOf(System.currentTimeMillis());
-        dbHelper.saveLocationToDatabase(latitude, longitude, timestamp, address, status, gameInfo);
+    private void recordGameState(String status, String gameInfo) {
+        locationHelper.getLocationInfo(locationData -> {
+            double latitude = locationData.getLatitude();
+            double longitude = locationData.getLongitude();
+            String address = locationData.getAddress();
+            String timestamp = String.valueOf(System.currentTimeMillis());
+
+            // 保存到数据库
+            dbHelper.saveLocationToDatabase(latitude, longitude, timestamp, address, status, gameInfo);
+        });
     }
 
 }

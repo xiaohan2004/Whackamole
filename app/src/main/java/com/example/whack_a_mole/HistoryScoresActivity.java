@@ -1,5 +1,7 @@
 package com.example.whack_a_mole;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -8,6 +10,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.amap.api.maps.AMap;
+import com.amap.api.maps.CameraUpdateFactory;
+import com.amap.api.maps.MapView;
+import com.amap.api.maps.model.LatLng;
+import com.amap.api.maps.model.MarkerOptions;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +29,8 @@ import java.util.Calendar;
 public class HistoryScoresActivity extends AppCompatActivity {
 
     private DBHelper dbHelper;
+    private MapView mapView;
+    private AMap aMap;
     private TextView tvLocationInfo, textViewStatus;
     private Button btnPrevious, btnNext, btnJump;
     private EditText etJumpTo;
@@ -40,6 +51,16 @@ public class HistoryScoresActivity extends AppCompatActivity {
         btnNext = findViewById(R.id.btn_next);
         btnJump = findViewById(R.id.btn_jump);
         etJumpTo = findViewById(R.id.et_jump_to);
+
+        // 检查权限
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+
+        // 初始化地图
+        mapView = findViewById(R.id.map);
+        mapView.onCreate(savedInstanceState);
+        aMap = mapView.getMap(); // 获取 AMap 实例
 
         loadData();
 
@@ -65,6 +86,26 @@ public class HistoryScoresActivity extends AppCompatActivity {
         });
     }
 
+    private void showCurrentLocation(double latitude, double longitude, String address) {
+        if (aMap == null) {
+            aMap = mapView.getMap();
+        }
+
+        // 清除之前的标记
+        aMap.clear();
+
+        // 添加当前位置标记
+        aMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title(address)
+                .snippet("Latitude: " + latitude + "\nLongitude: " + longitude)
+                .draggable(true)); // 如果需要可拖动，可以设置为 true
+
+        // 移动摄像头到当前位置
+        aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15)); // 15 是缩放级别
+    }
+
+
     private void loadData() {
         cursor = dbHelper.getAllLocationDataCursor(); // 使用光标逐个读取数据
         totalRecords = cursor.getCount();
@@ -88,6 +129,7 @@ public class HistoryScoresActivity extends AppCompatActivity {
 
             tvLocationInfo.setText("Latitude: " + latitude + "\nLongitude: " + longitude + "\nTimestamp: " + timestamp + "\nTime: " + convertTimestampStringToNormalTime(timestamp) + "\nTimeTGDZ: " + convertTimestampToTianGanDiZhi(timestamp) + "\nAddress: " + address + "\nGame_Status: " + game_status + "\nGame_Info: " + game_info);
             textViewStatus.setText((currentPosition + 1) + "/" + totalRecords);
+            showCurrentLocation(latitude, longitude, address); // 更新地图
         }
     }
 

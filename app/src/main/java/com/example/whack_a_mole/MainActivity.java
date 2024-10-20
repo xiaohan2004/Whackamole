@@ -1,10 +1,13 @@
 package com.example.whack_a_mole;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -15,6 +18,10 @@ public class MainActivity extends AppCompatActivity {
         Button btnStartGame = findViewById(R.id.btnStartGame);
         Button btnHistoryScores = findViewById(R.id.btnHistoryScores);
         Button btnSettings = findViewById(R.id.btnSettings);
+
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
 
         btnStartGame.setOnClickListener(v -> {
             // 跳转到游戏界面
