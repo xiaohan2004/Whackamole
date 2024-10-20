@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <!-- 分数显示 -->
+    <TextView
+        android:id="@+id/scoreText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:text="分数: 0"
+        android:textSize="24sp" />
+
+    <!-- 剩余时间显示 -->
+    <TextView
+        android:id="@+id/timerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="剩余时间: 30s"
+        android:textSize="24sp" />
+
+    <!-- 地鼠图像 -->
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:columnCount="4"
+        android:padding="10dp"
+        android:rowCount="4">
+
+        <!-- 生成 16 个地鼠 -->
+        <ImageView
+            android:id="@+id/mole1"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole2"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole3"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole4"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole5"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole6"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole7"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole8"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole9"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole10"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole11"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole12"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole13"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole14"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole15"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/mole16"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_rowWeight="1"
+            android:layout_columnWeight="1"
+            android:layout_margin="5dp"
+            android:clickable="true"
+            android:onClick="onMoleClick"
+            android:src="@drawable/mole_image"
+            android:visibility="invisible" />
+    </GridLayout>
+
+    <!-- 开始按钮 -->
+    <Button
+        android:id="@+id/btnStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="开始游戏" />
+
+</LinearLayout>
