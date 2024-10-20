@@ -1,7 +1,6 @@
 package com.example.whack_a_mole;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.Handler;
 import android.util.Log;
 

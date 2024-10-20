@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,9 +15,6 @@ import android.media.SoundPool;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.amap.api.location.AMapLocationClient;
 
 import java.util.HashSet;
 import java.util.Random;
@@ -26,8 +22,6 @@ import java.util.Set;
 
 
 public class GameActivity extends AppCompatActivity {
-    private static final int REQUEST_LOCATION_PERMISSION = 1;
-    private static final int REQUEST_CODE = 1;
     private TextView scoreText;
     private TextView timerText;
     private Button startButton; // 开始按钮
@@ -39,7 +33,7 @@ public class GameActivity extends AppCompatActivity {
     private ImageView[] moles;
     private Random random = new Random();
     private Handler handler = new Handler();
-    private String selectedDifficulty="medium";
+    private String selectedDifficulty = "medium";
     private SoundPool soundPool;
     private int hitSoundId;
     private int missSoundId;
@@ -83,20 +77,6 @@ public class GameActivity extends AppCompatActivity {
 
         dbHelper = new DBHelper(this);
 
-//        // 检查并请求定位权限
-//        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(this,
-//                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-//                    REQUEST_LOCATION_PERMISSION);
-//        }
-//
-//        // 更新隐私协议
-//        AMapLocationClient.updatePrivacyShow(this, true, true);
-//        AMapLocationClient.updatePrivacyAgree(this, true);
-
-//        locationHelper = new LocationHelper(this);
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
@@ -105,16 +85,12 @@ public class GameActivity extends AppCompatActivity {
 
         // 创建 LocationHelper 实例
         locationHelper = new LocationHelper(this);
-
-//        setDifficulty("medium");
     }
-
-
 
 
     @Override
     protected void onDestroy() {
-        recordGameState("中途退出","游戏难度："+selectedDifficulty+";游戏分数：" + score);
+        recordGameState("中途退出", "游戏难度：" + selectedDifficulty + ";游戏分数：" + score);
         dbHelper.close();
         if (locationHelper != null) {
             locationHelper.stopLocation();
@@ -144,7 +120,7 @@ public class GameActivity extends AppCompatActivity {
         setDifficulty(selectedDifficulty);
         // 禁用开始按钮，防止多次点击
         startButton.setEnabled(false);
-        recordGameState("游戏开始","游戏难度："+selectedDifficulty);
+        recordGameState("游戏开始", "游戏难度：" + selectedDifficulty);
 
         score = 0;
         timeRemaining = 30;
@@ -186,48 +162,6 @@ public class GameActivity extends AppCompatActivity {
                 break;
         }
     }
-
-//    private void showMoles() {
-//        handler.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (isGameActive) {
-//                    hideAllMoles();
-//                    int molesToShow = random.nextInt(maxMolesToShow) + 1; // 随机决定显示多少个地鼠
-//
-//                    // 使用Set来跟踪已经选择过的地鼠索引，避免重复
-//                    Set<Integer> selectedIndices = new HashSet<>();
-//
-//                    for (int i = 0; i < molesToShow; i++) {
-//                        int moleIndex;
-//                        do {
-//                            moleIndex = random.nextInt(moles.length);
-//                        } while (selectedIndices.contains(moleIndex));
-//                        selectedIndices.add(moleIndex);
-//
-//                        ImageView moleButton = moles[moleIndex];
-//                        moleButton.setVisibility(View.VISIBLE);
-//                        moleButton.setTag(false);
-//                    }
-//
-//                    // 设置隐藏时间，如果玩家没有点击则播放“未击中”音效
-//                    handler.postDelayed(() -> {
-//                        for (ImageView mole : moles) {
-//                            if (mole.getVisibility() == View.VISIBLE && !(boolean) mole.getTag()) {
-//                                // 地鼠显示且未被点击时播放“未击中”音效
-//                                if (soundPool != null) {
-//                                    soundPool.play(missSoundId, 1, 1, 0, 0, 1);
-//                                }
-//                            }
-//                        }
-//                        hideAllMoles(); // 隐藏所有地鼠
-//                    }, moleDuration);
-//
-//                    showMoles(); // 递归调用，继续显示地鼠
-//                }
-//            }
-//        }, 1000); // 每 1 秒显示一次地鼠
-//    }
 
     private void showMoles() {
         if (isGameActive) {
@@ -287,7 +221,7 @@ public class GameActivity extends AppCompatActivity {
     }
 
     private void showGameOverDialog() {
-        recordGameState("游戏结束","游戏难度："+selectedDifficulty+";游戏分数：" + score);
+        recordGameState("游戏结束", "游戏难度：" + selectedDifficulty + ";游戏分数：" + score);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("游戏结束")
                 .setMessage("你的最终分数是: " + score)

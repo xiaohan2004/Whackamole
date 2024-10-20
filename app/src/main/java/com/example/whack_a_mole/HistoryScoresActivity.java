@@ -21,9 +21,7 @@ import com.amap.api.maps.model.MarkerOptions;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.Calendar;
-
 
 
 public class HistoryScoresActivity extends AppCompatActivity {
@@ -205,7 +203,7 @@ public class HistoryScoresActivity extends AppCompatActivity {
 
         // 计算时辰
         int shichenIndex = (hour + 1) / 2 % 12; // 时辰，0-11
-        String hourTianGanDiZhi=diZhi[shichenIndex];
+        String hourTianGanDiZhi = diZhi[shichenIndex];
 
         return String.format("%s年%s月%s日%s时", yearTianGanDiZhi, monthTianGanDiZhi, dayTianGanDiZhi, hourTianGanDiZhi);
     }
