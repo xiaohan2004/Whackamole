@@ -204,12 +204,24 @@ public class HistoryScoresActivity extends AppCompatActivity {
     }
 
     private void jumpToRecord() {
-        String input = etJumpTo.getText().toString();
-        int jumpTo = Integer.parseInt(input) - 1; // 输入的条数从 1 开始
+        String input = etJumpTo.getText().toString().trim();
 
-        if (jumpTo >= 0 && jumpTo < totalRecords) {
-            currentPosition = jumpTo;
-            displayCurrentRecord();
+        // 检查输入是否为空或非数字字符
+        if (input.isEmpty()) {
+//            etJumpTo.setError("请输入一个数字");
+            return;
+        }
+
+        try {
+            int jumpTo = Integer.parseInt(input) - 1; // 输入从1开始计数，所以减去1
+            if (jumpTo >= 0 && jumpTo < totalRecords) {
+                currentPosition = jumpTo;
+                displayCurrentRecord();
+            } else {
+//                etJumpTo.setError("请输入范围内的数字");
+            }
+        } catch (NumberFormatException e) {
+//            etJumpTo.setError("无效的输入，请输入数字");
         }
     }
 
