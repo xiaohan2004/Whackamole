@@ -113,6 +113,7 @@ public class GameActivity extends AppCompatActivity {
                         selectedDifficulty = difficulties[which];
                     }
                 });
+        builder.setCancelable(false); // 设置为不可取消
         builder.create().show();
     }
 
