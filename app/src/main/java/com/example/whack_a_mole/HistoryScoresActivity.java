@@ -1,9 +1,14 @@
 package com.example.whack_a_mole;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,7 +31,8 @@ import java.util.Calendar;
 
 public class HistoryScoresActivity extends AppCompatActivity {
 
-    private DBHelper dbHelper;
+    private SQLiteOpenHelper DBHelper;
+    private String DB;
     private MapView mapView;
     private AMap aMap;
     private TextView tvLocationInfo, textViewStatus;
@@ -42,7 +48,6 @@ public class HistoryScoresActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_scores);
 
-        dbHelper = new DBHelper(this);
         tvLocationInfo = findViewById(R.id.tv_location_info);
         textViewStatus = findViewById(R.id.textViewStatus);
         btnPrevious = findViewById(R.id.btn_previous);
@@ -59,8 +64,6 @@ public class HistoryScoresActivity extends AppCompatActivity {
         mapView = findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         aMap = mapView.getMap(); // 获取 AMap 实例
-
-        loadData();
 
         btnPrevious.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,6 +85,36 @@ public class HistoryScoresActivity extends AppCompatActivity {
                 jumpToRecord();
             }
         });
+
+        showDatabaseSelectionDialog();
+    }
+
+    private void showDatabaseSelectionDialog() {
+        // 定义选择项
+        String[] options = {"GameRecordDBHelper", "LocationDBHelper"};
+
+        // 创建AlertDialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("请选择数据库");
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case 0:
+                        DBHelper = new GameRecordDBHelper(HistoryScoresActivity.this);
+                        DB = "GameRecordDBHelper";
+                        loadData();
+                        break;
+                    case 1:
+                        DBHelper = new LocationDBHelper(HistoryScoresActivity.this);
+                        DB = "LocationDBHelper";
+                        loadData();
+                        break;
+                }
+            }
+        });
+        builder.setCancelable(false); // 设置为不可取消
+        builder.create().show();
     }
 
     private void showCurrentLocation(double latitude, double longitude, String address) {
@@ -105,29 +138,54 @@ public class HistoryScoresActivity extends AppCompatActivity {
 
 
     private void loadData() {
-        cursor = dbHelper.getAllLocationDataCursor(); // 使用光标逐个读取数据
-        totalRecords = cursor.getCount();
-        if (totalRecords > 0) {
-            cursor.moveToFirst();
-            displayCurrentRecord();
+        if (DBHelper != null) {
+            cursor = null;
+            if (DBHelper instanceof GameRecordDBHelper) {
+                cursor = ((GameRecordDBHelper) DBHelper).getAllLocationDataCursor();
+            } else if (DBHelper instanceof LocationDBHelper) {
+                cursor = ((LocationDBHelper) DBHelper).getAllLocationDataCursor();
+            }
+
+            if (cursor != null) {
+                totalRecords = cursor.getCount();
+                if (totalRecords > 0) {
+                    cursor.moveToFirst();
+                    displayCurrentRecord();
+                } else {
+                    tvLocationInfo.setText("No records found");
+                    textViewStatus.setText("0/0");
+                }
+            }
         } else {
-            tvLocationInfo.setText("No records found");
-            textViewStatus.setText("0/0");
+            tvLocationInfo.setText("Database Helper is not initialized");
         }
     }
 
     private void displayCurrentRecord() {
-        if (currentPosition < totalRecords && cursor.moveToPosition(currentPosition)) {
-            double latitude = cursor.getDouble(cursor.getColumnIndex(DBHelper.COLUMN_LATITUDE));
-            double longitude = cursor.getDouble(cursor.getColumnIndex(DBHelper.COLUMN_LONGITUDE));
-            String timestamp = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_TIMESTAMP));
-            String address = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_ADDRESS));
-            String game_status = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_GAME_STATUS));
-            String game_info = cursor.getString(cursor.getColumnIndex(DBHelper.COLUMN_GAME_INFO));
+        if (DB.equals("GameRecordDBHelper")) {
+            if (currentPosition < totalRecords && cursor.moveToPosition(currentPosition)) {
+                @SuppressLint("Range") double latitude = cursor.getDouble(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_LATITUDE));
+                @SuppressLint("Range") double longitude = cursor.getDouble(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_LONGITUDE));
+                @SuppressLint("Range") String timestamp = cursor.getString(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_TIMESTAMP));
+                @SuppressLint("Range") String address = cursor.getString(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_ADDRESS));
+                @SuppressLint("Range") String game_status = cursor.getString(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_GAME_STATUS));
+                @SuppressLint("Range") String game_info = cursor.getString(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_GAME_INFO));
 
-            tvLocationInfo.setText("Latitude: " + latitude + "\nLongitude: " + longitude + "\nTimestamp: " + timestamp + "\nTime: " + convertTimestampStringToNormalTime(timestamp) + "\nTimeTGDZ: " + convertTimestampToTianGanDiZhi(timestamp) + "\nAddress: " + address + "\nGame_Status: " + game_status + "\nGame_Info: " + game_info);
-            textViewStatus.setText((currentPosition + 1) + "/" + totalRecords);
-            showCurrentLocation(latitude, longitude, address); // 更新地图
+                tvLocationInfo.setText("Latitude: " + latitude + "\nLongitude: " + longitude + "\nTimestamp: " + timestamp + "\nTime: " + convertTimestampStringToNormalTime(timestamp) + "\nTimeTGDZ: " + convertTimestampToTianGanDiZhi(timestamp) + "\nAddress: " + address + "\nGame_Status: " + game_status + "\nGame_Info: " + game_info);
+                textViewStatus.setText((currentPosition + 1) + "/" + totalRecords);
+                showCurrentLocation(latitude, longitude, address); // 更新地图
+            }
+        } else {
+            if (currentPosition < totalRecords && cursor.moveToPosition(currentPosition)) {
+                @SuppressLint("Range") double latitude = cursor.getDouble(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_LATITUDE));
+                @SuppressLint("Range") double longitude = cursor.getDouble(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_LONGITUDE));
+                @SuppressLint("Range") String timestamp = cursor.getString(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_TIMESTAMP));
+                @SuppressLint("Range") String address = cursor.getString(cursor.getColumnIndex(GameRecordDBHelper.COLUMN_ADDRESS));
+
+                tvLocationInfo.setText("Latitude: " + latitude + "\nLongitude: " + longitude + "\nTimestamp: " + timestamp + "\nTime: " + convertTimestampStringToNormalTime(timestamp) + "\nTimeTGDZ: " + convertTimestampToTianGanDiZhi(timestamp) + "\nAddress: " + address);
+                textViewStatus.setText((currentPosition + 1) + "/" + totalRecords);
+                showCurrentLocation(latitude, longitude, address); // 更新地图}
+            }
         }
     }
 
@@ -161,7 +219,7 @@ public class HistoryScoresActivity extends AppCompatActivity {
         if (cursor != null) {
             cursor.close();
         }
-        dbHelper.close();
+        DBHelper.close();
     }
 
     public String convertTimestampStringToNormalTime(String timestampStr) {

@@ -37,7 +37,7 @@ public class GameActivity extends AppCompatActivity {
     private SoundPool soundPool;
     private int hitSoundId;
     private int missSoundId;
-    private DBHelper dbHelper;
+    private GameRecordDBHelper gameRecordDbHelper;
     private LocationHelper locationHelper;
 
     @Override
@@ -75,7 +75,7 @@ public class GameActivity extends AppCompatActivity {
         hitSoundId = soundPool.load(this, R.raw.hit_sound, 1);
         missSoundId = soundPool.load(this, R.raw.miss_sound, 1);
 
-        dbHelper = new DBHelper(this);
+        gameRecordDbHelper = new GameRecordDBHelper(this);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
@@ -91,7 +91,7 @@ public class GameActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         recordGameState("中途退出", "游戏难度：" + selectedDifficulty + ";游戏分数：" + score);
-        dbHelper.close();
+        gameRecordDbHelper.close();
         if (locationHelper != null) {
             locationHelper.stopLocation();
         }
@@ -267,7 +267,7 @@ public class GameActivity extends AppCompatActivity {
             String timestamp = String.valueOf(System.currentTimeMillis());
 
             // 保存到数据库
-            dbHelper.saveLocationToDatabase(latitude, longitude, timestamp, address, status, gameInfo);
+            gameRecordDbHelper.saveLocationToDatabase(latitude, longitude, timestamp, address, status, gameInfo);
         });
     }
 
