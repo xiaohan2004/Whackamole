@@ -12,6 +12,7 @@ public class GameRecordDBHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
     public static final String TABLE_NAME = "location_data";
     public static final String COLUMN_ID = "id";
+    public static final String COLUMN_USER_NAME = "username";
     public static final String COLUMN_LATITUDE = "latitude"; // 经度
     public static final String COLUMN_LONGITUDE = "longitude";// 纬度
     public static final String COLUMN_TIMESTAMP = "timestamp"; // 时间戳
@@ -27,6 +28,7 @@ public class GameRecordDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_USER_NAME + " TEXT,"
                 + COLUMN_LATITUDE + " REAL,"
                 + COLUMN_LONGITUDE + " REAL,"
                 + COLUMN_TIMESTAMP + " TEXT,"
@@ -43,9 +45,10 @@ public class GameRecordDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void saveLocationToDatabase(double latitude, double longitude, String timestamp, String address, String gameStatus, String gameInfo) {
+    public void saveLocationToDatabase(String username, double latitude, double longitude, String timestamp, String address, String gameStatus, String gameInfo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(COLUMN_USER_NAME, username);
         values.put(COLUMN_LATITUDE, latitude);
         values.put(COLUMN_LONGITUDE, longitude);
         values.put(COLUMN_TIMESTAMP, timestamp);

@@ -3,6 +3,7 @@ package com.example.whack_a_mole;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
@@ -39,6 +40,7 @@ public class GameActivity extends AppCompatActivity {
     private int missSoundId;
     private GameRecordDBHelper gameRecordDbHelper;
     private LocationHelper locationHelper;
+    String username;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +82,8 @@ public class GameActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
         }
+
+        username = getUsername();
 
         showDifficultyDialog();
 
@@ -267,8 +271,12 @@ public class GameActivity extends AppCompatActivity {
             String timestamp = String.valueOf(System.currentTimeMillis());
 
             // 保存到数据库
-            gameRecordDbHelper.saveLocationToDatabase(latitude, longitude, timestamp, address, status, gameInfo);
+            gameRecordDbHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address, status, gameInfo);
         });
     }
 
+    private String getUsername() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        return sharedPreferences.getString("username", null); // 如果没有找到则返回 null
+    }
 }
