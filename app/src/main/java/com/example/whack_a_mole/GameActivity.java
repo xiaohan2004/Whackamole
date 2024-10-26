@@ -272,6 +272,7 @@ public class GameActivity extends AppCompatActivity {
 
             // 保存到数据库
             gameRecordDbHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address, status, gameInfo);
+            gameRecordDbHelper.sendDataToRemoteServer(username, latitude, longitude, timestamp, address, status, gameInfo);
         });
     }
 

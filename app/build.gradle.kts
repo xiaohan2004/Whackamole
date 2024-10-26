@@ -40,8 +40,11 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.navi.xdmap)
     implementation(libs.api.search)
+    implementation(libs.cronet.embedded)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.multidex:multidex:2.0.1")
 }

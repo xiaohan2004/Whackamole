@@ -1,187 +1,173 @@
 package com.example.whack_a_mole;
 
-import android.Manifest;
-import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.amap.api.maps.MapView;
-import com.amap.api.maps.AMap;
-import com.amap.api.maps.CameraUpdateFactory;
-import com.amap.api.maps.model.LatLng;
-import com.amap.api.maps.model.MarkerOptions;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import java.util.List;
 
 public class MoreFeatures extends AppCompatActivity {
 
-    private MapView mapView;
-    private TextView textViewLocationInfo;
-    private Button buttonStartLocation;
-    private AMap aMap;
-    private boolean isLocating = false; // 标记当前定位状态
-    private LocationDBHelper locationDBHelper; // 数据库帮助类
-    private LocationHelper locationHelper;
-    private boolean isTracking = false;
-    private final int LOCATION_UPDATE_INTERVAL = 15000; // 30秒更新一次
-    private Handler handler = new Handler(); // 用于定时更新
+    private Button btnRealTimeLocation;
+    private Button btnSyncDatabase;
+    private AlertDialog syncingDialog;
     String username;
+    LocationDBHelper locationDBHelper;
+    GameRecordDBHelper gameRecordDBHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_more_features);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
 
         username = getUsername();
 
-        // 初始化视图组件
-        mapView = findViewById(R.id.map);
-        textViewLocationInfo = findViewById(R.id.textViewLocationInfo);
-        buttonStartLocation = findViewById(R.id.buttonStartLocation);
+        // 获取按钮
+        btnRealTimeLocation = findViewById(R.id.btnRealTimeLocation);
+        btnSyncDatabase = findViewById(R.id.btnSyncDatabase);
 
-        // 初始化地图
-        mapView.onCreate(savedInstanceState);
-        aMap = mapView.getMap();
-
-        // 初始化数据库
         locationDBHelper = new LocationDBHelper(this);
+        gameRecordDBHelper = new GameRecordDBHelper(this);
 
-        // 创建 LocationHelper 实例
-        locationHelper = new LocationHelper(this);
-
-        // 按钮点击事件
-        buttonStartLocation.setOnClickListener(new View.OnClickListener() {
+        // 设置按钮点击事件
+        btnRealTimeLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isLocating) {
-                    stopLocation();
+                // 跳转到实时定位界面
+                Intent intent = new Intent(MoreFeatures.this, RealtimeLocation.class);
+                startActivity(intent);
+            }
+        });
+
+        btnSyncDatabase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 同步数据库逻辑
+                syncDatabase();
+            }
+        });
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
+    }
+
+    private void syncDatabase() {
+        // 显示正在同步的对话框
+        syncingDialog = new AlertDialog.Builder(this)
+                .setTitle("正在同步")
+                .setMessage("请稍候，正在同步数据库...")
+                .setCancelable(false) // 不可取消
+                .create();
+
+        syncingDialog.show();
+
+        // 在后台线程中执行同步操作
+        new Thread(() -> {
+            try {
+                performDatabaseSync(); // 同步方法
+            } catch (Exception e) {
+                Log.e("MoreFeatures", "数据库同步失败：" + e.getMessage());
+                handleSyncFailure("数据库同步过程中发生异常：" + e.getMessage());
+            }
+        }).start();
+    }
+
+    private void performDatabaseSync() {
+        RetrofitClient retrofitClient = new RetrofitClient();
+        retrofitClient.getByUsername(username, new RetrofitClient.DataCallback<List<ActInfo>>() {
+//        retrofitClient.getAll(new RetrofitClient.DataCallback<List<ActInfo>>() {
+            @Override
+            public void onSuccess(List<ActInfo> data) {
+                if (data != null) {
+                    int gameRecordDB = 0, locationDB = 0;
+                    locationDBHelper.deleteAllLocationData();
+                    gameRecordDBHelper.deleteAllLocationData();
+                    for (ActInfo actInfo : data) {
+                        long id = actInfo.getId();
+                        String userName = actInfo.getUserName();
+                        long uid = actInfo.getUid();
+                        String status = actInfo.getGame();
+                        String timestamp = String.valueOf(actInfo.getTime());
+                        String gameInfo = actInfo.getMessage();
+                        double latitude = actInfo.getLatitude();
+                        double longitude = actInfo.getLongitude();
+                        double altitude = actInfo.getAltitude();
+                        String address = actInfo.getAddress();
+
+                        if (uid == 1) {
+                            gameRecordDBHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address, status, gameInfo);
+                            gameRecordDB++;
+                        } else if (uid == 2) {
+                            locationDBHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address);
+                            locationDB++;
+                        }
+//                        if (userName.equals(username)) {
+//                            if (uid == 1) {
+//                                gameRecordDBHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address, status, gameInfo);
+//                                gameRecordDB++;
+//                            } else if (uid == 2) {
+//                                locationDBHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address);
+//                                locationDB++;
+//                            }
+//                        }
+                    }
+                    // 打印成功插入的数据
+                    Log.d("DatabaseSync", "同步数据成功:" + gameRecordDB + "条记录插入gameRecordDB, " + locationDB + "条记录插入locationDB, data中共有"+ data.size() + "条记录");
+                    // 同步完成，更新UI在主线程中执行
+                    runOnUiThread(() -> {
+                        if (syncingDialog != null && syncingDialog.isShowing()) {
+                            syncingDialog.dismiss(); // 关闭同步对话框
+                        }
+                        new AlertDialog.Builder(MoreFeatures.this)
+                                .setTitle("同步完成")
+                                .setMessage("数据库同步完成！")
+                                .setPositiveButton("确定", (dialog, which) -> dialog.dismiss())
+                                .create()
+                                .show();
+                    });
                 } else {
-                    startLocation();
+                    Log.e("getByUsername", "data为null!!!!!!!!!!!!!!!!!!!!!");
+                    handleSyncFailure("数据获取异常！");
                 }
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                // 打印错误信息
+                Log.e("getByUsername", "同步数据时发生错误: " + throwable.getMessage(), throwable);
             }
         });
     }
 
-    private void startLocation() {
-        isTracking = true;
-        isLocating = true;
-        buttonStartLocation.setText("停止定位");
-
-        // 每隔 30 秒更新一次位置信息
-        updateLocation();
-    }
-
-    private void stopLocation() {
-        isTracking = false;
-        isLocating = false;
-        buttonStartLocation.setText("开始定位");
-        locationHelper.stopLocation(); // 停止定位
-
-        // 移除更新位置的回调
-        handler.removeCallbacksAndMessages(null);
-    }
-
-    private void updateLocation() {
-        locationHelper.getLocationInfo(locationData -> {
-            runOnUiThread(() -> {
-                double latitude = locationData.getLatitude();
-                double longitude = locationData.getLongitude();
-                String address = locationData.getAddress();
-                String timestamp = String.valueOf(System.currentTimeMillis());
-
-                // 更新文本信息
-                textViewLocationInfo.setText("时间戳: " + timestamp + "\n时间: " + convertTimestampStringToNormalTime(timestamp) + "\n经度: " + latitude + "\n纬度: " + longitude + "\n地址: " + address);
-                showCurrentLocation(latitude, longitude, address);
-                locationDBHelper.saveLocationToDatabase(username, latitude, longitude, timestamp, address);
-            });
+    private void handleSyncFailure(String message) {
+        runOnUiThread(() -> {
+            syncingDialog.dismiss(); // 关闭对话框
+            new AlertDialog.Builder(MoreFeatures.this)
+                    .setTitle("同步失败")
+                    .setMessage("数据库同步失败: " + message)
+                    .setPositiveButton("确定", (dialog, which) -> dialog.dismiss())
+                    .create()
+                    .show();
         });
-
-        // 每 30 秒再次调用更新位置
-        if (isTracking) {
-            handler.postDelayed(this::updateLocation, LOCATION_UPDATE_INTERVAL);
-        }
-    }
-
-    private void showCurrentLocation(double latitude, double longitude, String address) {
-        if (aMap == null) {
-            aMap = mapView.getMap();
-        }
-
-        // 清除之前的标记
-        aMap.clear();
-
-        // 添加当前位置标记
-        aMap.addMarker(new MarkerOptions()
-                .position(new LatLng(latitude, longitude))
-                .title(address)
-                .snippet("Latitude: " + latitude + "\nLongitude: " + longitude)
-                .draggable(true)); // 如果需要可拖动，可以设置为 true
-
-        // 移动摄像头到当前位置
-        aMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(latitude, longitude), 15)); // 15 是缩放级别
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mapView.onPause();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-        if (locationDBHelper != null) {
-            locationDBHelper.close(); // 关闭数据库
-        }
-        if (locationHelper != null) {
-            locationHelper.stopLocation();
-        }
-        handler.removeCallbacksAndMessages(null); // 停止所有回调
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        mapView.onSaveInstanceState(outState);
     }
 
     private String getUsername() {
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         return sharedPreferences.getString("username", null); // 如果没有找到则返回 null
-    }
-
-    public String convertTimestampStringToNormalTime(String timestampStr) {
-        long timestamp = Long.parseLong(timestampStr);
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-//        sdf.setTimeZone(TimeZone.getTimeZone("Asia/Shanghai")); // 设置为你所在的时区，比如中国时区 "Asia/Shanghai"
-        Date date = new Date(timestamp);
-        return sdf.format(date);
     }
 }

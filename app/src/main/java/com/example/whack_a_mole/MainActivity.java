@@ -7,7 +7,6 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.DialogInterface;
 import android.widget.EditText;
@@ -75,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         btnSettings.setOnClickListener(v -> {
-            // 跳转到游戏设置界面
+            // 跳转到更多功能界面
             Intent intent = new Intent(MainActivity.this, MoreFeatures.class);
             startActivity(intent);
         });

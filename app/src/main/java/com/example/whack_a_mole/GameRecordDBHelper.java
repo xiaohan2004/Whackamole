@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class GameRecordDBHelper extends SQLiteOpenHelper {
 
@@ -45,6 +46,13 @@ public class GameRecordDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void deleteAllLocationData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
+        Log.d("DeleteData", "GameRecordDB所有数据已删除！");
+        db.close();
+    }
+
     public void saveLocationToDatabase(String username, double latitude, double longitude, String timestamp, String address, String gameStatus, String gameInfo) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -64,4 +72,21 @@ public class GameRecordDBHelper extends SQLiteOpenHelper {
         return db.query(TABLE_NAME, null, null, null, null, null, null);
     }
 
+    public void sendDataToRemoteServer(String username, double latitude, double longitude, String timestamp, String address, String gameStatus, String gameInfo) {
+        RetrofitClient retrofitClient = new RetrofitClient();
+        ActInfo actInfo = new ActInfo(username, latitude, longitude, Long.parseLong(timestamp), address, gameStatus, gameInfo);
+        retrofitClient.insertData(actInfo, new RetrofitClient.DataCallback<ActInfo>() {
+            @Override
+            public void onSuccess(ActInfo data) {
+                // 打印成功插入的数据
+                Log.d("InsertData", "数据插入成功: " + data.toString());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                // 打印错误信息
+                Log.e("InsertData", "插入数据时发生错误: " + throwable.getMessage(), throwable);
+            }
+        });
+    }
 }

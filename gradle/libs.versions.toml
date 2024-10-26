@@ -13,6 +13,7 @@ xdmapLocationSearch = "10.0.900_loc6.4.7_sea9.7.3"
 location = "6.4.7"
 core = "4.3.13"
 searchVersion = "9.4.0"
+cronetEmbedded = "119.6045.31"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -28,6 +29,7 @@ xdmap-location-search = { group = "com.amap.api", name = "3dmap-location-search"
 location = { group = "com.amap.api", name = "location", version.ref = "location" }
 core = { group = "com.amap.api", name = "core", version.ref = "core" }
 api-search = { group = "com.amap.api", name = "search", version.ref = "searchVersion" }
+cronet-embedded = { group = "org.chromium.net", name = "cronet-embedded", version.ref = "cronetEmbedded" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

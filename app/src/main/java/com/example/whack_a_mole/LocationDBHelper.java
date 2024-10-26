@@ -41,6 +41,13 @@ public class LocationDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    public void deleteAllLocationData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, null, null);
+        Log.d("DeleteData", "LocationDB所有数据已删除！");
+        db.close();
+    }
+
     public void saveLocationToDatabase(String username, double latitude, double longitude, String timestamp, String address) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -57,5 +64,23 @@ public class LocationDBHelper extends SQLiteOpenHelper {
     public Cursor getAllLocationDataCursor() {
         SQLiteDatabase db = this.getReadableDatabase();
         return db.query(TABLE_NAME, null, null, null, null, null, null);
+    }
+
+    public void sendDataToRemoteServer(String username, double latitude, double longitude, String timestamp, String address) {
+        RetrofitClient retrofitClient = new RetrofitClient();
+        ActInfo actInfo = new ActInfo(username, latitude, longitude, Long.parseLong(timestamp), address);
+        retrofitClient.insertData(actInfo,new RetrofitClient.DataCallback<ActInfo>() {
+            @Override
+            public void onSuccess(ActInfo data) {
+                // 打印成功插入的数据
+                Log.d("InsertData", "数据插入成功: " + data.toString());
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                // 打印错误信息
+                Log.e("InsertData", "插入数据时发生错误: " + throwable.getMessage(), throwable);
+            }
+        });
     }
 }
