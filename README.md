@@ -47,7 +47,7 @@
 1. 克隆项目到本地
 
 ```bash
-git clone [项目地址]
+git clone https://github.com/xiaohan2004/Whackamole
 ```
 
 2. 在 Android Studio 中打开项目
