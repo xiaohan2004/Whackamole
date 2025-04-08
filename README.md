@@ -2,6 +2,11 @@
 
 一个基于 Android 平台开发的打地鼠游戏，具有实时定位功能和数据同步功能。
 
+## 运行截图
+![image](https://github.com/user-attachments/assets/b1eec16f-9517-43c9-ad80-7dd788897c73)
+![image](https://github.com/user-attachments/assets/5e60e9d2-5813-4dba-a2f0-5556b6432df4)
+![image](https://github.com/user-attachments/assets/be0d780b-35e3-42d6-a2c9-3322766418dd)
+
 ## 功能特点
 
 - 多难度等级的打地鼠游戏
