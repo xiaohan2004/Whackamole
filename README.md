@@ -3,9 +3,9 @@
 一个基于 Android 平台开发的打地鼠游戏，具有实时定位功能和数据同步功能。
 
 ## 项目截图
-![项目截图1.png](assets%2F%CF%EE%C4%BF%BD%D8%CD%BC1.png)
-![项目截图2.png](assets%2F%CF%EE%C4%BF%BD%D8%CD%BC2.png)
-![项目截图3.png](assets%2F%CF%EE%C4%BF%BD%D8%CD%BC3.png)
+![项目截图1.png](assets/%E9%A1%B9%E7%9B%AE%E6%88%AA%E5%9B%BE1.png)
+![项目截图2.png](assets/%E9%A1%B9%E7%9B%AE%E6%88%AA%E5%9B%BE2.png)
+![项目截图3.png](assets/%E9%A1%B9%E7%9B%AE%E6%88%AA%E5%9B%BE3.png)
 
 ## 功能特点
 
